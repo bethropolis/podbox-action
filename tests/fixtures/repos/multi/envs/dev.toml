@@ -1,5 +1,5 @@
 [image]
-base = "fedora:44"
+base = "alpine:latest"
 name = "dev"
 
 [image.packages]

@@ -1,5 +1,5 @@
 [image]
-base = "archlinux:latest"
+base = "alpine:latest"
 name = "gaming"
 
 [image.packages]
