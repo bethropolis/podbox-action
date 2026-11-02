@@ -37,6 +37,8 @@ jobs:
           persist-credentials: false
       - name: Install skopeo for base image digest resolution
         run: sudo apt-get update -y && sudo apt-get install -y skopeo
+      - name: Debug skopeo base image resolution
+        run: skopeo inspect docker://alpine:latest --raw 2>&1 || true
       - id: pub
         uses: ./
         with:
