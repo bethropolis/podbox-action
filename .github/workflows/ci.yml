@@ -37,6 +37,14 @@ jobs:
           persist-credentials: false
       - name: Install skopeo/podman for base image digest resolution
         run: sudo apt-get update -y && sudo apt-get install -y skopeo podman
+      - name: Debug skopeo base image resolution
+        run: |
+          echo "=== alpine:latest ==="
+          skopeo inspect --raw docker://alpine:latest 2>&1; echo "EXIT=$?"
+          echo "=== alpine@sha256 digest ==="
+          skopeo inspect --raw docker://alpine@sha256:c26612752c78b18faacd63c7d50f4592c2e7b0f25e0e20e82bd74e465c57ab0d 2>&1; echo "EXIT=$?"
+          echo "=== docker.io/library/alpine:3.24 ==="
+          skopeo inspect --raw docker://docker.io/library/alpine:3.24 2>&1; echo "EXIT=$?"
       - id: pub
         uses: ./
         with:
