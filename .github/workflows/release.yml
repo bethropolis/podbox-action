@@ -1,0 +1,26 @@
+name: release
+
+# Pushing a tag like v1.2.3 moves the floating v1 tag, which is what
+# users reference (`uses: bethropolis/podbox-action@v1`).
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: write
+
+jobs:
+  move-major-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Needed: this job pushes the moving tag.
+          persist-credentials: true
+      - name: Move the major tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          major="${TAG%%.*}"
+          git tag -f "$major"
+          git push -f origin "refs/tags/$major"

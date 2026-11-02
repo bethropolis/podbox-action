@@ -1,0 +1,18 @@
+# Publish every environment in this repo to GHCR.
+# Works with a single podbox.toml, an envs/*.toml directory, or an images.toml.
+name: publish
+on:
+  push:
+    branches: [main]
+  pull_request:          # builds and validates, never pushes
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: bethropolis/podbox-action@v1

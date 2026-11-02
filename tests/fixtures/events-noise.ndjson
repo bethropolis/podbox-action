@@ -1,0 +1,3 @@
+hello from a buggy podbox
+{"schema":1,"event":"future-event","x":1}
+{"schema":1,"event":"image","key":"dev","ref":"ghcr.io/me/repo/dev","digest":"sha256:aaaaaaaaaaaa1111111111111111111111111111111111111111111111111111","tags":["latest"],"pushed":true,"skipped":false}

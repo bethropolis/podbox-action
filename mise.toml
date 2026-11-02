@@ -1,0 +1,8 @@
+[tools]
+# Same pins as podbox's own mise.toml where they overlap.
+shellcheck = "0.11.0"
+just = "1.58.0"
+# Latest releases at the time this template was written; bump deliberately.
+bats = "1.14.0"
+actionlint = "1.7.12"
+zizmor = "1.31.1"

@@ -1,0 +1,10 @@
+[image]
+base = "fedora:44"
+name = "dev"
+
+[image.packages]
+install = ["git", "gcc", "ripgrep"]
+
+[container]
+name = "dev"
+home = "~/containers/dev"

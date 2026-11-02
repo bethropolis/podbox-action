@@ -1,0 +1,49 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@82a612c5ab8bcda7cc5db6b7e81a8e7584c3dc6e # v5.2.3
+      - run: just check
+
+  # Runs the real action end to end. Disabled until podbox ships
+  # `publish` and `build --emit-context`: set the repository variable
+  # PODBOX_PUBLISH_AVAILABLE=true to enable it.
+  self-test:
+    if: ${{ vars.PODBOX_PUBLISH_AVAILABLE == 'true' }}
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: pub
+        uses: ./
+        with:
+          images: tests/fixtures/repos/multi/images.toml
+          push: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
+      - name: Check outputs
+        env:
+          IMAGES: ${{ steps.pub.outputs.images }}
+        run: |
+          echo "$IMAGES" | jq .
+          echo "$IMAGES" | jq -e 'length == 2'

@@ -1,0 +1,101 @@
+name: podbox publish
+description: Build podbox environments from TOML and publish them as prebuilt images to GHCR.
+author: bethropolis
+branding:
+  icon: package
+  color: purple
+
+inputs:
+  images:
+    description: >
+      Path to the images.toml manifest. Empty (default) lets podbox discover
+      images: images.toml, then envs/*.toml, then a single podbox.toml.
+    required: false
+    default: ""
+  only:
+    description: Space-separated image keys to build. Empty builds everything.
+    required: false
+    default: ""
+  push:
+    description: >
+      auto pushes except on pull_request events; true/false force it. Pull
+      requests never push, whatever this is set to.
+    required: false
+    default: auto
+  force:
+    description: Rebuild even when the remote image is already up to date (use on schedules).
+    required: false
+    default: "false"
+  registry:
+    description: Registry host to log in to and publish to.
+    required: false
+    default: ghcr.io
+  token:
+    description: Registry password. The default workflow token works for GHCR.
+    required: false
+    default: ${{ github.token }}
+  podbox-version:
+    description: podbox release tag to install, or "latest".
+    required: false
+    default: latest
+  working-directory:
+    description: Directory containing the manifest or configs.
+    required: false
+    default: "."
+
+outputs:
+  images:
+    description: >
+      JSON array of {key, ref, digest, tags, pushed, skipped, first_push, error}
+      for every image podbox reported.
+    value: ${{ steps.publish.outputs.images }}
+  pushed:
+    description: Number of images pushed.
+    value: ${{ steps.publish.outputs.pushed }}
+  skipped:
+    description: Number of images skipped because they were already up to date.
+    value: ${{ steps.publish.outputs.skipped }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install podbox
+      id: install
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        PODBOX_VERSION: ${{ inputs.podbox-version }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: '"$ACTION_PATH/scripts/install.sh"'
+
+    - name: Check podbox can publish
+      id: preflight
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        INPUT_PUSH: ${{ inputs.push }}
+      run: '"$ACTION_PATH/scripts/preflight.sh"'
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+    - name: Log in to the registry
+      if: steps.preflight.outputs.push == 'true'
+      uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ github.actor }}
+        password: ${{ inputs.token }}
+
+    - name: Publish images
+      id: publish
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        PUSH: ${{ steps.preflight.outputs.push }}
+        INPUT_ONLY: ${{ inputs.only }}
+        INPUT_IMAGES: ${{ inputs.images }}
+        INPUT_REGISTRY: ${{ inputs.registry }}
+        INPUT_FORCE: ${{ inputs.force }}
+        INPUT_WORKDIR: ${{ inputs.working-directory }}
+      run: '"$ACTION_PATH/scripts/publish.sh"'

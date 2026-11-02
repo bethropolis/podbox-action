@@ -1,0 +1,11 @@
+schema_version = 1
+registry  = "ghcr.io"
+platforms = ["linux/amd64"]
+tags      = ["latest", "sha"]
+
+[images.dev]
+config = "envs/dev.toml"
+
+[images.gaming]
+config = "envs/gaming.toml"
+tags   = ["latest", "nightly"]

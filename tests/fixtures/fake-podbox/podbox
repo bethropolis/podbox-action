@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Stub `podbox` for tests. Implements just enough of the PROJECT_GUIDE.md
+# section 1.6 contract for the action scripts. NOT a real podbox.
+#
+# Knobs (env):
+#   FAKE_PODBOX_FEATURES  JSON array for `info`      default ["publish","emit_context"]
+#   FAKE_PODBOX_SCHEMA    schema number for `info`   default 1
+#   FAKE_PODBOX_EXTRA     JSON object merged into `info` output  default {}
+#   FAKE_PODBOX_PLAN      file printed by `publish --list`
+#   FAKE_PODBOX_EVENTS    file printed by `publish` (ndjson)
+#   FAKE_PODBOX_EXIT      exit code of `publish`     default 0
+#   FAKE_PODBOX_ARGS_LOG  file; each call appends "CALL" then one arg per line
+set -euo pipefail
+
+if [ -n "${FAKE_PODBOX_ARGS_LOG:-}" ]; then
+  {
+    echo CALL
+    printf '%s\n' "$@"
+  } >>"$FAKE_PODBOX_ARGS_LOG"
+fi
+
+case "${1:-}" in
+  --version)
+    echo "podbox 0.10.0 (fake)"
+    ;;
+  info)
+    jq -n \
+      --argjson f "${FAKE_PODBOX_FEATURES:-[\"publish\",\"emit_context\"]}" \
+      --argjson s "${FAKE_PODBOX_SCHEMA:-1}" \
+      --argjson e "${FAKE_PODBOX_EXTRA:-{\}}" \
+      '{schema: $s, podbox: "0.10.0", podman: "5.6.0", features: $f} + $e'
+    ;;
+  publish)
+    for a in "$@"; do
+      if [ "$a" = "--list" ]; then
+        if [ -n "${FAKE_PODBOX_PLAN:-}" ]; then
+          cat "$FAKE_PODBOX_PLAN"
+        else
+          echo '{"schema":1,"images":[]}'
+        fi
+        exit 0
+      fi
+    done
+    if [ -n "${FAKE_PODBOX_EVENTS:-}" ]; then
+      cat "$FAKE_PODBOX_EVENTS"
+    fi
+    exit "${FAKE_PODBOX_EXIT:-0}"
+    ;;
+  *)
+    echo "fake podbox: unsupported command: ${1:-}" >&2
+    exit 64
+    ;;
+esac

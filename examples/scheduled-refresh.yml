@@ -1,0 +1,20 @@
+# Baked images go stale when their base image does. Rebuild weekly, and
+# force it so the "already up to date" shortcut cannot skip the refresh.
+name: weekly-refresh
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: bethropolis/podbox-action@v1
+        with:
+          force: "true"

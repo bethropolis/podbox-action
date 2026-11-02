@@ -1,0 +1,10 @@
+[image]
+base = "archlinux:latest"
+name = "gaming"
+
+[image.packages]
+install = ["steam", "mangohud"]
+
+[container]
+name = "gaming"
+home = "~/containers/gaming"

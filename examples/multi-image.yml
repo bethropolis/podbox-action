@@ -1,0 +1,31 @@
+# Several environments described by images.toml at the repo root.
+name: publish
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+
+# Two pushes racing on the same tag: let the first finish, queue the next.
+concurrency:
+  group: podbox-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - id: podbox
+        uses: bethropolis/podbox-action@v1
+        with:
+          images: images.toml
+          # only: dev gaming     # build a subset
+      - name: Show what was published
+        env:
+          IMAGES: ${{ steps.podbox.outputs.images }}
+        run: echo "$IMAGES" | jq -r '.[] | "\(.key) -> \(.ref)@\(.digest)"'

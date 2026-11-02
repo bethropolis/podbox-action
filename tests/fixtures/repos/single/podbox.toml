@@ -1,0 +1,10 @@
+[image]
+base = "fedora:44"
+name = "single"
+
+[image.packages]
+install = ["git", "ripgrep"]
+
+[container]
+name = "single"
+home = "~/containers/single"

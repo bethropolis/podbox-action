@@ -1,0 +1,6 @@
+rules:
+  # `uses: ./` is the long-standing, universally supported way to run the
+  # action in this repository; the newer `$/` syntax is not needed here.
+  self-repository:
+    ignore:
+      - ci.yml

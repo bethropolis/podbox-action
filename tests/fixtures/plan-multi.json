@@ -1,0 +1,1 @@
+{"schema":1,"images":[{"key":"dev","config":"envs/dev.toml","ref":"ghcr.io/me/repo/dev","tags":["latest","sha-abc1234"],"platforms":["linux/amd64"]},{"key":"gaming","config":"envs/gaming.toml","ref":"ghcr.io/me/repo/gaming","tags":["latest","nightly"],"platforms":["linux/amd64"]}]}
