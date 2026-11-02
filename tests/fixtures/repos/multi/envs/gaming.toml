@@ -3,7 +3,8 @@ base = "alpine@sha256:c26612752c78b18faacd63c7d50f4592c2e7b0f25e0e20e82bd74e465c
 name = "gaming"
 
 [image.packages]
-install = ["steam", "mangohud"]
+install = ["git", "curl"]
+manager = "apk"
 
 [container]
 name = "gaming"

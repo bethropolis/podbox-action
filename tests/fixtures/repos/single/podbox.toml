@@ -4,6 +4,7 @@ name = "single"
 
 [image.packages]
 install = ["git", "ripgrep"]
+manager = "apk"
 
 [container]
 name = "single"

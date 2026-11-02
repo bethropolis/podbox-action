@@ -4,6 +4,7 @@ name = "dev"
 
 [image.packages]
 install = ["git", "gcc", "ripgrep"]
+manager = "apk"
 
 [container]
 name = "dev"
